@@ -5,7 +5,7 @@ from tkinter import ttk
 
 def main():
     root = tk.Tk()
-    root.title("DNA Extraction Device")
+    root.title("DNA Extraction Device newsdfs")
     root.attributes("-fullscreen", True)
     root.configure(bg="#1e1e1e")
 
