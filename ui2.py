@@ -730,19 +730,96 @@ def show_pin_error(parent):
               command=box.destroy).pack(pady=40)
 
 
+def fullscreen_info(title, message, color="#007bff"):
+    popup = tk.Toplevel(window)
+    popup.overrideredirect(True)
+    popup.attributes("-topmost", True)
+    popup.grab_set()
+
+    sw = window.winfo_screenwidth()
+    sh = window.winfo_screenheight()
+
+    popup.geometry(f"{sw}x{sh}+0+0")
+    popup.configure(bg="white")
+
+    popup.lift()
+    popup.focus_force()
+    popup.update_idletasks()
+
+    card_w = min(800, sw - 100)
+    card_h = 360
+    x = (sw - card_w) // 2
+    y = (sh - card_h) // 2
+
+    card = tk.Frame(popup, bg="white", bd=4, relief="ridge")
+    card.place(x=x, y=y, width=card_w, height=card_h)
+
+    tk.Label(card, text=title,
+             font=("Arial", 28, "bold"),
+             bg="white", fg=color).pack(pady=(30, 10))
+
+    tk.Label(card, text=message,
+             font=("Arial", 22),
+             bg="white",
+             wraplength=card_w - 80,
+             justify="center").pack(pady=20)
+
+    tk.Button(card, text="OK",
+              font=("Arial", 26, "bold"),
+              bg=color, fg="white",
+              width=10,
+              command=popup.destroy).pack(pady=35)
+
+    # Force cursor into popup center
+    popup.after(50, lambda: popup.event_generate(
+        "<Motion>", warp=True,
+        x=sw//2 - popup.winfo_rootx(),
+        y=sh//2 - popup.winfo_rooty()
+    ))
+
+    popup.wait_window()
+
+
+
+
+# def update_ui():
+#     repo_path = "/home/sppat/shubham"  # Exact path from realpath
+#     if not os.path.exists(repo_path):
+#         messagebox.showerror("Error", f"Repository folder not found:\n{repo_path}")
+#         return
+
+#     try:
+#         os.chdir(repo_path)
+#         result = subprocess.check_output(["git", "pull"], stderr=subprocess.STDOUT, text=True)
+#         messagebox.showinfo("Update Result", result)
+#     except subprocess.CalledProcessError as e:
+#         messagebox.showerror("Update Failed", e.output)
+
 
 def update_ui():
-    repo_path = "/home/sppat/shubham"  # Exact path from realpath
+    repo_path = "/home/sppat/shubham"
+
     if not os.path.exists(repo_path):
-        messagebox.showerror("Error", f"Repository folder not found:\n{repo_path}")
+        fullscreen_info("Update", "Update failed.", color="#dc3545")
         return
 
     try:
         os.chdir(repo_path)
-        result = subprocess.check_output(["git", "pull"], stderr=subprocess.STDOUT, text=True)
-        messagebox.showinfo("Update Result", result)
-    except subprocess.CalledProcessError as e:
-        messagebox.showerror("Update Failed", e.output)
+        result = subprocess.check_output(
+            ["git", "pull"],
+            stderr=subprocess.STDOUT,
+            text=True
+        )
+
+        # Simplify git output
+        if "Already up to date" in result or "Already up-to-date" in result:
+            fullscreen_info("Update", "Software is already up to date.", color="#28a745")
+        else:
+            fullscreen_info("Update", "Software updated successfully.", color="#28a745")
+
+    except subprocess.CalledProcessError:
+        # Do NOT show technical error
+        fullscreen_info("Update", "Update failed.", color="#dc3545")
 
 
 
