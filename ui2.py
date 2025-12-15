@@ -729,9 +729,12 @@ def show_pin_error(parent):
               bg="#dc3545", fg="white", width=10, height=2,
               command=box.destroy).pack(pady=40)
 
-
 def fullscreen_info(title, message, color="#007bff"):
     popup = tk.Toplevel(window)
+
+    # 🔒 HIDE first (prevents corner patch)
+    popup.withdraw()
+
     popup.overrideredirect(True)
     popup.attributes("-topmost", True)
     popup.grab_set()
@@ -739,13 +742,17 @@ def fullscreen_info(title, message, color="#007bff"):
     sw = window.winfo_screenwidth()
     sh = window.winfo_screenheight()
 
+    # Force full screen size BEFORE showing
     popup.geometry(f"{sw}x{sh}+0+0")
     popup.configure(bg="white")
 
+    # Now show
+    popup.deiconify()
     popup.lift()
     popup.focus_force()
     popup.update_idletasks()
 
+    # ---------- CENTER CARD ----------
     card_w = min(800, sw - 100)
     card_h = 360
     x = (sw - card_w) // 2
@@ -770,7 +777,7 @@ def fullscreen_info(title, message, color="#007bff"):
               width=10,
               command=popup.destroy).pack(pady=35)
 
-    # Force cursor into popup center
+    # 🔥 Force cursor into center (touch fix)
     popup.after(50, lambda: popup.event_generate(
         "<Motion>", warp=True,
         x=sw//2 - popup.winfo_rootx(),
