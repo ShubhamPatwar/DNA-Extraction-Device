@@ -333,7 +333,7 @@ def mixer(motor_s, duration):
 #         motion_motor(steps, motor_s, delay, 'down')
 
 
-def mixer_wash(motor_s, duration):
+def mixer_wash_fan(motor_s, duration):
     steps = 80
     delay = 0.0004
     start_time = time.time()
