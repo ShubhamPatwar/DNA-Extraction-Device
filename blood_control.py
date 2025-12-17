@@ -50,7 +50,7 @@ def run_motor_sequence_blood():
         pause_event.wait()
         timer_module.start_timer(1200)
         # mixer(2,1200)        #1200####### LYSIS ########
-        wash_mixer(2,4)
+        wash_mixer(2,4*60)
         if common.stop_flag: return
         safe_sleep(0.5)
 
