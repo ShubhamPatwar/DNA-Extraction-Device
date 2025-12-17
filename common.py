@@ -304,15 +304,44 @@ def mixer(motor_s, duration):
 #         motion_motor(steps, motor_s, delay, 'down')
 
 
-def mixer_wash_fan(motor_s, duration):
+# def mixer_wash_fan(motor_s, duration):
+#     steps = 80
+#     delay = 0.0004
+#     start_time = time.time()
+
+#     fan_turned_on = False
+
+#     # 🔥 Heater OFF at start of wash
+#     stop_heating_only()   # we will define this below
+
+#     while time.time() - start_time < duration:
+#         if stop_flag:
+#             return
+
+#         pause_event.wait()
+
+#         elapsed = time.time() - start_time
+#         remaining = duration - elapsed
+
+#         # 🌬️ Turn fan ON in last 5 minutes
+#         if remaining <= 60*2 and not fan_turned_on:
+#             if not fan_state:
+#                 fan_turned_on = True
+
+
+#         motion_motor(steps, motor_s, delay, 'up')
+#         motion_motor(steps, motor_s, delay, 'down')
+
+
+def mixer_wash(motor_s, duration):
     steps = 80
     delay = 0.0004
     start_time = time.time()
 
-    fan_turned_on = False
+    fan_started = False
 
-    # 🔥 Heater OFF at start of wash
-    stop_heating_only()   # we will define this below
+    # 🔥 Heater OFF at wash start
+    stop_heating_only()
 
     while time.time() - start_time < duration:
         if stop_flag:
@@ -323,14 +352,16 @@ def mixer_wash_fan(motor_s, duration):
         elapsed = time.time() - start_time
         remaining = duration - elapsed
 
-        # 🌬️ Turn fan ON in last 5 minutes
-        if remaining <= 60*2 and not fan_turned_on:
-            if not fan_state:
-                fan_turned_on = True
-
+        # 🌬️ Fan ON only in last 5 minutes
+        if duration > 60*2 and remaining <= 60*2 and not fan_started:
+            set_fan(True)
+            fan_started = True
 
         motion_motor(steps, motor_s, delay, 'up')
         motion_motor(steps, motor_s, delay, 'down')
+
+    # 🌬️ Fan OFF after wash
+    set_fan(False)
 
 
 def last_mixer(motor_s, duration):
@@ -411,3 +442,12 @@ def safe_sleep(seconds, tick=0.05):
 
 
 
+def set_fan(state: bool):
+    global fan_state
+
+    if fan_state == state:
+        return  # no change
+
+    fan_state = state
+    GPIO.output(FAN_PIN, GPIO.HIGH if fan_state else GPIO.LOW)
+    log_status(f"Fan {'ON' if fan_state else 'OFF'}")
