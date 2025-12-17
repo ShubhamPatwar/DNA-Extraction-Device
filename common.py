@@ -124,6 +124,12 @@ mlx2 = adafruit_mlx90614.MLX90614(i2c , address = 0x5B)
 #         return {}
 
 
+def stop_heating_only():
+    global heating_active
+    heating_active = False
+    pwm_1.ChangeDutyCycle(0)
+    pwm_2.ChangeDutyCycle(0)
+    log_status("Heating OFF for wash step.")
 
 
 
@@ -285,15 +291,44 @@ def mixer(motor_s, duration):
         motion_motor(steps, motor_s, delay, 'up')
         motion_motor(steps, motor_s, delay, 'down')
 
-def mixer_wash(motor_s, duration):
+# def mixer_wash(motor_s, duration):
+#     steps = 80
+#     delay = 0.0004
+#     start_time = time.time()
+
+#     while time.time() - start_time < duration:
+#         if stop_flag:
+#             return
+#         pause_event.wait()  # <-- pause support
+#         motion_motor(steps, motor_s, delay, 'up')
+#         motion_motor(steps, motor_s, delay, 'down')
+
+
+def mixer_wash_fan(motor_s, duration):
     steps = 80
     delay = 0.0004
     start_time = time.time()
 
+    fan_turned_on = False
+
+    # 🔥 Heater OFF at start of wash
+    stop_heating_only()   # we will define this below
+
     while time.time() - start_time < duration:
         if stop_flag:
             return
-        pause_event.wait()  # <-- pause support
+
+        pause_event.wait()
+
+        elapsed = time.time() - start_time
+        remaining = duration - elapsed
+
+        # 🌬️ Turn fan ON in last 5 minutes
+        if remaining <= 300 and not fan_turned_on:
+            if not fan_state:
+                fan_turned_on = True
+
+
         motion_motor(steps, motor_s, delay, 'up')
         motion_motor(steps, motor_s, delay, 'down')
 

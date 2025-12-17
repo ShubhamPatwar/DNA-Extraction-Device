@@ -18,7 +18,7 @@ def run_motor_sequence_blood():
     motion_motor_both = common.motion_motor_both
     mixer = common.mixer
     last_mixer = common.last_mixer
-    wash_mixer = common.mixer_wash
+    wash_mixer = common.mixer_wash_fan # sirf yahan change karna
 
     define_motors()
     try:
@@ -99,7 +99,7 @@ def run_motor_sequence_blood():
         if common.stop_flag: return
         pause_event.wait()
         timer_module.start_timer(300)
-        mixer(2,60)         #600##### LYSIS WITH BEADS ########
+        mixer(2,60)                       ##### LYSIS WITH BEADS ########
         if common.stop_flag: return
         safe_sleep(0.5)
 
