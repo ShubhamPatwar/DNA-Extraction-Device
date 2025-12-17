@@ -124,14 +124,25 @@ mlx2 = adafruit_mlx90614.MLX90614(i2c , address = 0x5B)
 #         return {}
 
 
+# def stop_heating_only():
+#     global heating_active
+#     heating_active = False
+#     pwm_1.ChangeDutyCycle(0)
+#     pwm_2.ChangeDutyCycle(0)
+#     log_status("Heating OFF for wash step.")
+
+
 def stop_heating_only():
     global heating_active
     heating_active = False
+
     pwm_1.ChangeDutyCycle(0)
     pwm_2.ChangeDutyCycle(0)
-    log_status("Heating OFF for wash step.")
 
+    GPIO.output(BIDIRECTION_PIN_1, GPIO.LOW)
+    GPIO.output(BIDIRECTION_PIN_2, GPIO.LOW)
 
+    log_status("Heating OFF for wash step (PWM + direction disabled)")
 
 
 # --- GPIO + Motor Definitions ---
