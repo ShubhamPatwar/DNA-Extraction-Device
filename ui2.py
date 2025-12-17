@@ -824,9 +824,17 @@ def update_ui():
         else:
             fullscreen_info("Update", "Software updated successfully.", color="#28a745")
 
-    except subprocess.CalledProcessError:
-        # Do NOT show technical error
-        fullscreen_info("Update", "Update failed.", color="#dc3545")
+    # except subprocess.CalledProcessError:
+    #     # Do NOT show technical error
+    #     fullscreen_info("Update", "Update failed.", color="#dc3545")  # for not showing error
+
+    except subprocess.CalledProcessError as e:
+    # 🔴 SHOW RAW GIT ERROR
+        fullscreen_info(
+            "Update Failed",
+            e.output,
+            color="#dc3545"
+        )
 
 
 
