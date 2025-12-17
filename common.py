@@ -324,7 +324,7 @@ def mixer_wash_fan(motor_s, duration):
         remaining = duration - elapsed
 
         # 🌬️ Turn fan ON in last 5 minutes
-        if remaining <= 300 and not fan_turned_on:
+        if remaining <= 60*2 and not fan_turned_on:
             if not fan_state:
                 fan_turned_on = True
 
