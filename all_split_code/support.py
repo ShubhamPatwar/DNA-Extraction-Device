@@ -21,7 +21,7 @@ def define_motors():
 
     motor_pins = [
         {'DIR_PIN': 17, 'STEP_PIN': 4, 'LIMIT_PIN': 25},
-        {'DIR_PIN': 27, 'STEP_PIN': 22, 'LIMIT_PIN': 16},  # 2
+        {'DIR_PIN': 27, 'STEP_PIN': 22, 'LIMIT_PIN': 21},  # 2
         {'DIR_PIN': 23, 'STEP_PIN': 24, 'LIMIT_PIN': 12}
     ]
 

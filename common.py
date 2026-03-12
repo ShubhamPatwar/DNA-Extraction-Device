@@ -234,6 +234,7 @@ def loop(direction_pin, arrow, step_pin, delay, steps, repeat_no):
     GPIO.output(direction_pin, GPIO.LOW)
 
 
+
 def loop_together(motor_A, motor_B, arrow, steps, delay):
     step_pin_A = motor_A["STEP_PIN"]
     step_pin_B = motor_B["STEP_PIN"]
@@ -291,7 +292,7 @@ def motion_motor(steps, motor_number, delay, axis):
 
 
 def mixer(motor_s, duration):
-    steps = 90
+    steps = 100
     delay = 0.0004
     start_time = time.time()
 
@@ -345,8 +346,8 @@ def mixer(motor_s, duration):
 
 
 def mixer_wash_fan(motor_s, duration):
-    steps = 80
-    delay = 0.0004
+    steps = 50
+    delay = 0.00038
     start_time = time.time()
 
     fan_started = False
@@ -377,7 +378,7 @@ def mixer_wash_fan(motor_s, duration):
 
 def last_mixer(motor_s, duration):
     steps = 50
-    delay = 0.0005
+    delay = 0.0004
     start_time = time.time()
 
     while time.time() - start_time < duration:
@@ -429,7 +430,7 @@ def sleeve_change_sequence():
         safe_sleep(0.5)
 
         if stop_flag: return
-        motion_motor(780, 2, 0.0004, 'down')  # adjust steps if needed
+        motion_motor(850, 2, 0.0004, 'down')  # 780 adjust steps if needed
         if stop_flag: return
         safe_sleep(0.5)
 

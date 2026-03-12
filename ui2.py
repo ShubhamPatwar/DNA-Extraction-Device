@@ -803,6 +803,14 @@ def fullscreen_info(title, message, color="#007bff"):
 #         messagebox.showerror("Update Failed", e.output)
 
 
+def debug_ui():
+    import subprocess
+    import sys
+    import os
+    subprocess.Popen([sys.executable, os.path.join(os.path.dirname(os.path.abspath(__file__)), "debug_ui.py")])
+
+
+
 def update_ui():
     repo_path = "/home/sppat/shubham"
 
@@ -946,7 +954,7 @@ window.bind('<Escape>', lambda e: window.attributes('-fullscreen', False))  # fo
 top_bar = tk.Frame(window, bg="#343a40", height=50)
 top_bar.pack(fill="x", side="top")
 
-title_label = tk.Label(top_bar, text="DNA Extraction Device",
+title_label = tk.Label(top_bar, text="Shubham DNA Extraction Device",
                        font=("Helvetica", 16, "bold"), fg="white", bg="#343a40")
 title_label.pack(side="left", padx=20)
 
@@ -967,6 +975,9 @@ update_btn = tk.Button(top_bar, text="Update", bg="#007bff", fg="white",
                        font=("Arial", 15, "bold"), command=update_ui)
 update_btn.pack(side="right", padx=5, pady=5)
 
+debug_btn = tk.Button(top_bar, text="Debug", bg="#e30fab", fg="white",
+                       font=("Arial", 15, "bold"), command=debug_ui)
+debug_btn.pack(side="right", padx=5, pady=5)
 
 
 

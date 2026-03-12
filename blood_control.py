@@ -35,28 +35,27 @@ def run_motor_sequence_blood():
 
         if common.stop_flag: return            ###### LYSIS #######
         pause_event.wait()
-        motion_motor(2265, 3, 0.0004, 'right')
+        motion_motor(2250, 3, 0.0004, 'right')
         if common.stop_flag: return
         safe_sleep(0.5)
 
 
         if common.stop_flag: return
         pause_event.wait()
-        motion_motor(835, 2, 0.0004, 'down')
+        motion_motor(1000, 2, 0.0004, 'down')
         if common.stop_flag: return
         safe_sleep(0.5)
 
         if common.stop_flag: return
         pause_event.wait()
-        timer_module.start_timer(4*60)
-        # mixer(2,1200)        #1200####### LYSIS ########
-        wash_mixer(2,4*60)
+        timer_module.start_timer(20*60)
+        mixer(2,1200)        #1200####### LYSIS ########
         if common.stop_flag: return
         safe_sleep(0.5)
 
         if common.stop_flag: return
         pause_event.wait()
-        motion_motor(835, 2, 0.0004, 'up')
+        motion_motor(1000, 2, 0.0004, 'up')
         if common.stop_flag: return
         safe_sleep(0.5)
 
@@ -68,14 +67,14 @@ def run_motor_sequence_blood():
 
         if common.stop_flag: return
         pause_event.wait()
-        motion_motor_both(1670, 1, 2, 0.0002, 'down')
+        motion_motor_both(2000, 1, 2, 0.0002, 'down')
         if common.stop_flag: return
         timer_module.start_timer(45)
-        safe_sleep(45)
+        safe_sleep(45) 
 
         if common.stop_flag: return
         pause_event.wait()
-        motion_motor_both(1670, 1, 2, 0.0002, 'up')
+        motion_motor_both(2000, 1, 2, 0.0002, 'up')
         if common.stop_flag: return
         safe_sleep(0.5)
 
@@ -87,32 +86,32 @@ def run_motor_sequence_blood():
 
         if common.stop_flag: return
         pause_event.wait()
-        motion_motor_both(1670, 1, 2, 0.0002, 'down')
+        motion_motor_both(2000, 1, 2, 0.0002, 'down')
         if common.stop_flag: return
         safe_sleep(0.5)
 
         if common.stop_flag: return
         pause_event.wait()
-        motion_motor(835, 1, 0.0004, 'up')
+        motion_motor(1000, 1, 0.0004, 'up')
         if common.stop_flag: return
         safe_sleep(0.5)
 
         if common.stop_flag: return
         pause_event.wait()
-        timer_module.start_timer(300)
-        mixer(2,60)                       ##### LYSIS WITH BEADS ########
+        timer_module.start_timer(180)
+        mixer(2,180)                       ##### LYSIS WITH BEADS ########
         if common.stop_flag: return
         safe_sleep(0.5)
 
         if common.stop_flag: return
         pause_event.wait()
-        motion_motor(835, 2, 0.0004, 'up')
+        motion_motor(1000, 2, 0.0004, 'up')
         if common.stop_flag: return
         safe_sleep(0.5)
 
         if common.stop_flag: return
         pause_event.wait()
-        motion_motor_both(1600, 1, 2, 0.0002, 'down')
+        motion_motor_both(1910, 1, 2, 0.0002, 'down')
         if common.stop_flag: return
         timer_module.start_timer(30)
         safe_sleep(30)  #30
@@ -126,44 +125,44 @@ def run_motor_sequence_blood():
 
         if common.stop_flag: return
         pause_event.wait()
-        motion_motor_both(1670, 1, 2, 0.0002, 'up')
+        motion_motor_both(1980, 1, 2, 0.0002, 'up')
         if common.stop_flag: return
         safe_sleep(0.5)
 
         if common.stop_flag: return       ######### WASH-1 ########
         pause_event.wait()
-        motion_motor(685, 3, 0.0004, 'right')
+        motion_motor(675, 3, 0.0004, 'right')
         if common.stop_flag: return
         safe_sleep(0.5)
 
         if common.stop_flag: return
         pause_event.wait()
-        motion_motor_both(1670, 1, 2, 0.0002, 'down')
+        motion_motor_both(2000, 1, 2, 0.0002, 'down')
         if common.stop_flag: return
         safe_sleep(0.5)
 
         if common.stop_flag: return
         pause_event.wait()
-        motion_motor(835, 1, 0.0004, 'up')
+        motion_motor(1000, 1, 0.0004, 'up')
         if common.stop_flag: return
         safe_sleep(0.5)
 
         if common.stop_flag: return
         pause_event.wait()
         timer_module.start_timer(300)
-        wash_mixer(2, 30)        #300##### WASH-1 ######
+        wash_mixer(2, 300)        #300##### WASH-1 ######
         if common.stop_flag: return
         safe_sleep(0.5)
 
         if common.stop_flag: return
         pause_event.wait()
-        motion_motor(835, 2, 0.0004, 'up')
+        motion_motor(1000, 2, 0.0004, 'up')
         if common.stop_flag: return
         safe_sleep(0.5)
 
         if common.stop_flag: return
         pause_event.wait()
-        motion_motor_both(1600, 1, 2, 0.0002, 'down')
+        motion_motor_both(1910, 1, 2, 0.0002, 'down')
         if common.stop_flag: return
         timer_module.start_timer(30)
         safe_sleep(30)        #60
@@ -177,7 +176,7 @@ def run_motor_sequence_blood():
 
         if common.stop_flag: return
         pause_event.wait()
-        motion_motor_both(1670, 1, 2, 0.0002, 'up')
+        motion_motor_both(1980, 1, 2, 0.0002, 'up')
         if common.stop_flag: return
         safe_sleep(0.5)
 
@@ -190,46 +189,46 @@ def run_motor_sequence_blood():
                 log_status("last flag reached")
                 if common.stop_flag: return
                 pause_event.wait()
-                motion_motor(230, 3, 0.0004, 'right')
+                motion_motor(222, 3, 0.0004, 'right')
                 if common.stop_flag: return
                 timer_module.start_timer(300)
-                safe_sleep(30)    ###Air Dry
+                safe_sleep(300)    ###Air Dry
 
                 if common.stop_flag: return
                 pause_event.wait()
-                motion_motor_both(1690, 1, 2, 0.0002, 'down')
+                motion_motor_both(2000, 1, 2, 0.0002, 'down')
                 if common.stop_flag: return
                 safe_sleep(0.5)
 
                 if common.stop_flag: return
                 pause_event.wait()
-                motion_motor(845, 1, 0.0004, 'up')
+                motion_motor(1000, 1, 0.0004, 'up')
                 if common.stop_flag: return
                 safe_sleep(0.5)
 
                 if common.stop_flag: return
                 pause_event.wait()
-                timer_module.start_timer(300)
-                last_mixer(2, 30)          #300####### ELUTION ########
+                timer_module.start_timer(600)
+                last_mixer(2, 600)          #300####### ELUTION ########
                 if common.stop_flag: return
                 safe_sleep(0.5)
 
                 if common.stop_flag: return
                 pause_event.wait()
-                motion_motor(845, 2, 0.0004, 'up')
+                motion_motor(1000, 2, 0.0004, 'up')
                 if common.stop_flag: return
                 safe_sleep(0.5)
 
                 if common.stop_flag: return
                 pause_event.wait()
-                motion_motor_both(1690, 1, 2, 0.0002, 'down')
+                motion_motor_both(2000, 1, 2, 0.0002, 'down')
                 if common.stop_flag: return
-                timer_module.start_timer(30)
+                timer_module.start_timer(60)
                 safe_sleep(60)       #60
 
                 if common.stop_flag: return
                 pause_event.wait()
-                motion_motor_both(1690, 1, 2, 0.0002, 'up')
+                motion_motor_both(2000, 1, 2, 0.0002, 'up')
                 if common.stop_flag: return
                 safe_sleep(0.5)
 
@@ -242,32 +241,32 @@ def run_motor_sequence_blood():
 
                 if common.stop_flag: return
                 pause_event.wait()
-                motion_motor_both(1670, 1, 2, 0.0002, 'down')
+                motion_motor_both(2000, 1, 2, 0.0002, 'down')
                 if common.stop_flag: return
                 safe_sleep(0.5)
 
                 if common.stop_flag: return
                 pause_event.wait()
-                motion_motor(835, 1, 0.0004, 'up')
+                motion_motor(1000, 1, 0.0004, 'up')
                 if common.stop_flag: return
                 safe_sleep(0.5)
 
                 if common.stop_flag: return
                 pause_event.wait()
                 timer_module.start_timer(600)
-                wash_mixer(2, 60)        #600###### WASH-2 #####
+                wash_mixer(2, 600)        #600###### WASH-2 #####
                 if common.stop_flag: return
                 safe_sleep(0.5)
 
                 if common.stop_flag: return
                 pause_event.wait()
-                motion_motor(835, 2, 0.0004, 'up')
+                motion_motor(1000, 2, 0.0004, 'up')
                 if common.stop_flag: return
                 safe_sleep(0.5)
 
                 if common.stop_flag: return
                 pause_event.wait()
-                motion_motor_both(1600, 1, 2, 0.0002, 'down')
+                motion_motor_both(1910, 1, 2, 0.0002, 'down')
                 if common.stop_flag: return
                 timer_module.start_timer(30)
                 safe_sleep(30)     #60
@@ -281,7 +280,7 @@ def run_motor_sequence_blood():
 
                 if common.stop_flag: return
                 pause_event.wait()
-                motion_motor_both(1670, 1, 2, 0.0002, 'up')
+                motion_motor_both(1980, 1, 2, 0.0002, 'up')
                 if common.stop_flag: return
                 safe_sleep(0.5)    
 
@@ -294,7 +293,7 @@ def run_motor_sequence_blood():
 
         if common.stop_flag: return
         pause_event.wait()
-        motion_motor(820, 2, 0.0004, 'down')
+        motion_motor(850, 2, 0.0004, 'down')
         if common.stop_flag: return
         safe_sleep(0.5)
 
