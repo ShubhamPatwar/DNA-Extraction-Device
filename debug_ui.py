@@ -643,39 +643,76 @@ class DebugUI:
     # ─── Stop all hardware ────────────────────────────────────────────────────
 
     def _stop_all(self):
-        """Stop everything — mirrors stop_process() from ui2.py exactly."""
+        """Stop everything with a waiting overlay until thread exits."""
         self._log("⏹ STOP ALL pressed", "warn")
 
-        # 1. Signal any running motor thread to stop
+        # ── Show overlay immediately ───────────────────────────
+        overlay = tk.Frame(self.window, bg="#0d1117")
+        overlay.place(x=0, y=0, width=W, height=H)
+        overlay.lift()
+
+        tk.Label(overlay, text="⏹  Stopping...",
+                 font=("Helvetica", 28, "bold"),
+                 fg=RED, bg="#0d1117").place(relx=0.5, rely=0.38, anchor="center")
+
+        tk.Label(overlay, text="Waiting for motors to halt safely",
+                 font=("Arial", 14), fg=TEXT_DIM,
+                 bg="#0d1117").place(relx=0.5, rely=0.50, anchor="center")
+
+        # Animated dots label
+        dots_lbl = tk.Label(overlay, text="●  ●  ●",
+                            font=("Arial", 18), fg=AMBER,
+                            bg="#0d1117")
+        dots_lbl.place(relx=0.5, rely=0.60, anchor="center")
+
+        self.window.update()
+
+        # Animate dots while waiting
+        dot_states = ["●        ", "●  ●     ", "●  ●  ●"]
+        dot_idx    = [0]
+        def animate_dots():
+            if overlay.winfo_exists():
+                dots_lbl.config(text=dot_states[dot_idx[0] % 3])
+                dot_idx[0] += 1
+                overlay.after(350, animate_dots)
+        animate_dots()
+
+        # ── Signal stop ────────────────────────────────────────
         common.stop_flag = True
-        common.pause_event.set()          # unblock any paused safe_sleep
+        common.pause_event.set()
         common.heating_active = False
 
-        # 2. Stop PWM immediately
+        # Stop PWM immediately
         try:
             common.pwm_1.ChangeDutyCycle(0)
             common.pwm_2.ChangeDutyCycle(0)
-            self._log("  PWM → 0%", "warn")
         except Exception as e:
-            self._log(f"  PWM stop ERR: {e}", "err")
+            self._log(f"  PWM ERR: {e}", "err")
 
-        # 3. Wait briefly for extraction thread to exit (non-blocking)
-        try:
-            if common.extraction_thread and common.extraction_thread.is_alive():
-                self._log("  Waiting for motor thread...", "warn")
-                common.extraction_thread.join(timeout=1)
-        except Exception:
-            pass
+        # ── Wait for thread in background, dismiss overlay when done ──
+        def wait_and_finish():
+            try:
+                if common.extraction_thread and common.extraction_thread.is_alive():
+                    common.extraction_thread.join(timeout=15)
+            except Exception:
+                pass
 
-        # 4. Disable all motor enable pins (HIGH = disabled, active-low)
+            # Now safe to kill GPIO
+            self.window.after(0, lambda: self._finish_stop(overlay))
+
+        threading.Thread(target=wait_and_finish, daemon=True).start()
+
+    def _finish_stop(self, overlay):
+        """Called on main thread once motor thread has exited."""
+        # Disable motor enable pins
         try:
             for pin in common.ENABLE_PINS:
                 GPIO.output(pin, GPIO.HIGH)
-            self._log("  Motor ENABLE pins → HIGH (disabled)", "warn")
+            self._log("  Motors disabled", "warn")
         except Exception as e:
             self._log(f"  Motor disable ERR: {e}", "err")
 
-        # 5. Stop fan
+        # Stop fan
         try:
             common.set_fan(False)
             self._fan_on = False
@@ -684,15 +721,21 @@ class DebugUI:
             self.fan_warn.config(text="")
             self._log("  Fan → OFF", "warn")
         except Exception as e:
-            self._log(f"  Fan stop ERR: {e}", "err")
+            self._log(f"  Fan ERR: {e}", "err")
 
-        # 6. Update peltier UI labels
+        # Update peltier UI
         try:
             self._p1_state_lbl.config(text="● IDLE", fg=TEXT_DIM)
-            self._p1_duty_lbl.config(text="Duty: 0%", fg=TEXT_DIM)
+            self._p1_duty_lbl.config(text="Duty: 0%",  fg=TEXT_DIM)
             self._p2_state_lbl.config(text="● IDLE", fg=TEXT_DIM)
-            self._p2_duty_lbl.config(text="Duty: 0%", fg=TEXT_DIM)
+            self._p2_duty_lbl.config(text="Duty: 0%",  fg=TEXT_DIM)
             self._peltier_state = {1: "off", 2: "off"}
+        except Exception:
+            pass
+
+        # Dismiss overlay
+        try:
+            overlay.destroy()
         except Exception:
             pass
 
