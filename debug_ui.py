@@ -510,10 +510,16 @@ class DebugUI:
         self._log(f"Motor {motor_num} → {dir_label}  {STEP_TEST} steps")
         def run():
             try:
+                # Reset stop flag so motor can move after a previous STOP ALL
+                common.stop_flag = False
+                common.pause_event.set()
+
                 pins = MOTORS[motor_num]
                 GPIO.output(common.ENABLE_PINS[motor_num - 1], GPIO.LOW)
                 GPIO.output(pins["DIR"], GPIO.HIGH if direction == "up" else GPIO.LOW)
                 for _ in range(STEP_TEST):
+                    if common.stop_flag:   # respect STOP ALL mid-run
+                        break
                     GPIO.output(pins["STEP"], GPIO.HIGH); time.sleep(STEP_DELAY)
                     GPIO.output(pins["STEP"], GPIO.LOW);  time.sleep(STEP_DELAY)
                 GPIO.output(common.ENABLE_PINS[motor_num - 1], GPIO.HIGH)
@@ -531,6 +537,10 @@ class DebugUI:
         self._log(f"Motor {motor_num} → Homing")
         def run():
             try:
+                # Reset stop flag before homing
+                common.stop_flag = False
+                common.pause_event.set()
+
                 pins = MOTORS[motor_num]
                 GPIO.output(common.ENABLE_PINS[motor_num - 1], GPIO.LOW)
                 GPIO.output(pins["DIR"], GPIO.HIGH)
