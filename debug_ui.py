@@ -90,6 +90,13 @@ class DebugUI:
                   bg=GREEN, fg="white", relief="flat", bd=0,
                   activebackground=GREEN,
                   command=self._on_close
+                  ).place(x=W - 340, y=8, width=158, height=28)
+
+        tk.Button(top, text="⏹  STOP ALL",
+                  font=("Arial", 10, "bold"),
+                  bg=RED, fg="white", relief="flat", bd=0,
+                  activebackground=RED,
+                  command=self._stop_all
                   ).place(x=W - 170, y=8, width=158, height=28)
 
         # ── Right log panel ───────────────────────────────────────
@@ -618,6 +625,51 @@ class DebugUI:
             self._log(f"Peltier {num} stopped")
         except Exception as e:
             self._log(f"Peltier {num} stop ERR: {e}", "err")
+
+    # ─── Stop all hardware ────────────────────────────────────────────────────
+
+    def _stop_all(self):
+        """Emergency stop — kills all motors, peltiers, fan instantly."""
+        self._log("⏹ STOP ALL pressed — halting all hardware", "warn")
+
+        # Stop peltiers
+        try:
+            common.pwm_1.ChangeDutyCycle(0)
+            common.pwm_2.ChangeDutyCycle(0)
+            common.heating_active = False
+            GPIO.output(common.BIDIRECTION_PIN_1, GPIO.LOW)
+            GPIO.output(common.BIDIRECTION_PIN_2, GPIO.LOW)
+            self._log("  Peltiers stopped", "warn")
+        except Exception as e:
+            self._log(f"  Peltier stop ERR: {e}", "err")
+
+        # Disable all motors (ENABLE HIGH = off)
+        try:
+            for pin in common.ENABLE_PINS:
+                GPIO.output(pin, GPIO.HIGH)
+            self._log("  Motors disabled", "warn")
+        except Exception as e:
+            self._log(f"  Motor disable ERR: {e}", "err")
+
+        # Stop fan
+        try:
+            common.set_fan(False)
+            self._fan_on = False
+            self.fan_indicator.config(text="● OFF", fg=RED)
+            self.fan_toggle_btn.config(text="Turn Fan ON", bg=GREEN)
+            self.fan_warn.config(text="")
+            self._log("  Fan stopped", "warn")
+        except Exception as e:
+            self._log(f"  Fan stop ERR: {e}", "err")
+
+        # Update peltier state labels
+        try:
+            self._p1_temp_lbl.config(fg=TEXT_DIM)
+            self._p2_temp_lbl.config(fg=TEXT_DIM)
+        except Exception:
+            pass
+
+        self._log("⏹ All hardware stopped.", "warn")
 
     # ─── Close / return to main UI ────────────────────────────────────────────
 
