@@ -689,21 +689,24 @@ class DebugUI:
         except Exception as e:
             self._log(f"  PWM ERR: {e}", "err")
 
-        # ── Wait for thread in background, dismiss overlay when done ──
-        def wait_and_finish():
-            try:
-                if common.extraction_thread and common.extraction_thread.is_alive():
-                    common.extraction_thread.join(timeout=15)
-            except Exception:
-                pass
+        # ── Countdown 10s then finish ─────────────────────────
+        countdown_lbl = tk.Label(overlay, text="10",
+                                 font=("Courier", 36, "bold"),
+                                 fg=GREEN_LT, bg="#0d1117")
+        countdown_lbl.place(relx=0.5, rely=0.72, anchor="center")
 
-            # Now safe to kill GPIO
-            self.window.after(0, lambda: self._finish_stop(overlay))
+        self._countdown(overlay, countdown_lbl, 10)
 
-        threading.Thread(target=wait_and_finish, daemon=True).start()
+    def _countdown(self, overlay, lbl, seconds):
+        """Count down seconds on screen, then finish stop."""
+        if seconds > 0:
+            lbl.config(text=str(seconds))
+            self.window.after(1000, lambda: self._countdown(overlay, lbl, seconds - 1))
+        else:
+            self._finish_stop(overlay)
 
     def _finish_stop(self, overlay):
-        """Called on main thread once motor thread has exited."""
+        """Called after countdown — clean up GPIO and dismiss overlay."""
         # Disable motor enable pins
         try:
             for pin in common.ENABLE_PINS:
