@@ -385,11 +385,15 @@ class DebugUI:
                   command=lambda n=num, s=state_lbl, d=duty_lbl: self._peltier_stop(n, s, d)
                   ).place(x=8, y=H_ - 34, width=W_ - 16, height=26)
 
-        # Store temp label ref for live update
+        # Store label refs for stop_all to update
         if num == 1:
-            self._p1_temp_lbl = temp_lbl
+            self._p1_temp_lbl  = temp_lbl
+            self._p1_state_lbl = state_lbl
+            self._p1_duty_lbl  = duty_lbl
         else:
-            self._p2_temp_lbl = temp_lbl
+            self._p2_temp_lbl  = temp_lbl
+            self._p2_state_lbl = state_lbl
+            self._p2_duty_lbl  = duty_lbl
 
     # ─── Widget helpers ───────────────────────────────────────────────────────
 
@@ -629,43 +633,56 @@ class DebugUI:
     # ─── Stop all hardware ────────────────────────────────────────────────────
 
     def _stop_all(self):
-        """Emergency stop — kills all motors, peltiers, fan instantly."""
-        self._log("⏹ STOP ALL pressed — halting all hardware", "warn")
+        """Stop everything — mirrors stop_process() from ui2.py exactly."""
+        self._log("⏹ STOP ALL pressed", "warn")
 
-        # Stop peltiers
+        # 1. Signal any running motor thread to stop
+        common.stop_flag = True
+        common.pause_event.set()          # unblock any paused safe_sleep
+        common.heating_active = False
+
+        # 2. Stop PWM immediately
         try:
             common.pwm_1.ChangeDutyCycle(0)
             common.pwm_2.ChangeDutyCycle(0)
-            common.heating_active = False
-            GPIO.output(common.BIDIRECTION_PIN_1, GPIO.LOW)
-            GPIO.output(common.BIDIRECTION_PIN_2, GPIO.LOW)
-            self._log("  Peltiers stopped", "warn")
+            self._log("  PWM → 0%", "warn")
         except Exception as e:
-            self._log(f"  Peltier stop ERR: {e}", "err")
+            self._log(f"  PWM stop ERR: {e}", "err")
 
-        # Disable all motors (ENABLE HIGH = off)
+        # 3. Wait briefly for extraction thread to exit (non-blocking)
+        try:
+            if common.extraction_thread and common.extraction_thread.is_alive():
+                self._log("  Waiting for motor thread...", "warn")
+                common.extraction_thread.join(timeout=1)
+        except Exception:
+            pass
+
+        # 4. Disable all motor enable pins (HIGH = disabled, active-low)
         try:
             for pin in common.ENABLE_PINS:
                 GPIO.output(pin, GPIO.HIGH)
-            self._log("  Motors disabled", "warn")
+            self._log("  Motor ENABLE pins → HIGH (disabled)", "warn")
         except Exception as e:
             self._log(f"  Motor disable ERR: {e}", "err")
 
-        # Stop fan
+        # 5. Stop fan
         try:
             common.set_fan(False)
             self._fan_on = False
             self.fan_indicator.config(text="● OFF", fg=RED)
             self.fan_toggle_btn.config(text="Turn Fan ON", bg=GREEN)
             self.fan_warn.config(text="")
-            self._log("  Fan stopped", "warn")
+            self._log("  Fan → OFF", "warn")
         except Exception as e:
             self._log(f"  Fan stop ERR: {e}", "err")
 
-        # Update peltier state labels
+        # 6. Update peltier UI labels
         try:
-            self._p1_temp_lbl.config(fg=TEXT_DIM)
-            self._p2_temp_lbl.config(fg=TEXT_DIM)
+            self._p1_state_lbl.config(text="● IDLE", fg=TEXT_DIM)
+            self._p1_duty_lbl.config(text="Duty: 0%", fg=TEXT_DIM)
+            self._p2_state_lbl.config(text="● IDLE", fg=TEXT_DIM)
+            self._p2_duty_lbl.config(text="Duty: 0%", fg=TEXT_DIM)
+            self._peltier_state = {1: "off", 2: "off"}
         except Exception:
             pass
 
